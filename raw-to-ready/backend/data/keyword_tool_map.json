@@ -1,0 +1,70 @@
+{
+  "mappings": [
+    {
+      "id": "ecommerce-shopify",
+      "keywords": ["shopify", "online store", "ecommerce", "e-commerce", "product sales", "sell online", "storefront", "drop shipping", "dropshipping", "physical product", "merchandise"],
+      "tools": ["shopify", "square", "stripe"],
+      "category": "E-Commerce"
+    },
+    {
+      "id": "inventory-management",
+      "keywords": ["inventory", "stock", "SKU", "warehouse", "bulk order", "reorder", "units", "storage", "fulfillment"],
+      "tools": ["tradegecko", "shipstation", "shopify"],
+      "category": "Inventory"
+    },
+    {
+      "id": "supplier-sourcing",
+      "keywords": ["supplier", "wholesale", "manufacturer", "lumber", "fabric", "raw material", "sourcing", "vendor", "B2B", "bulk", "MOQ", "minimum order", "factory"],
+      "tools": ["faire", "shipstation"],
+      "category": "Supply Chain"
+    },
+    {
+      "id": "subscription-model",
+      "keywords": ["subscription", "recurring revenue", "membership", "monthly plan", "annual plan", "SaaS", "tiered pricing", "recurring billing"],
+      "tools": ["stripe", "ghost", "gumroad"],
+      "category": "Billing"
+    },
+    {
+      "id": "email-marketing",
+      "keywords": ["email list", "newsletter", "email campaign", "drip sequence", "open rate", "subscribers", "automation", "email marketing"],
+      "tools": ["mailchimp", "convertkit", "klaviyo"],
+      "category": "Marketing"
+    },
+    {
+      "id": "crm-sales",
+      "keywords": ["CRM", "leads", "pipeline", "sales funnel", "prospects", "follow up", "deals", "outreach", "cold email"],
+      "tools": ["hubspot", "pipedrive"],
+      "category": "CRM"
+    },
+    {
+      "id": "project-management",
+      "keywords": ["tasks", "project", "sprint", "roadmap", "kanban", "backlog", "milestones", "team", "collaboration", "workflow"],
+      "tools": ["notion", "asana", "monday", "clickup", "linear"],
+      "category": "Productivity"
+    },
+    {
+      "id": "accounting",
+      "keywords": ["invoices", "expenses", "taxes", "bookkeeping", "accounting", "profit and loss", "balance sheet", "payroll", "receipts", "cash flow"],
+      "tools": ["freshbooks", "xero", "wave", "quickbooks"],
+      "category": "Finance"
+    },
+    {
+      "id": "design-branding",
+      "keywords": ["logo", "branding", "design", "mockup", "visual", "UI", "graphics", "social media graphics", "poster", "banner"],
+      "tools": ["canva", "figma", "adobe"],
+      "category": "Design"
+    },
+    {
+      "id": "website-building",
+      "keywords": ["website", "landing page", "web presence", "portfolio", "domain", "hosting", "blog", "content site"],
+      "tools": ["webflow", "framer", "bluehost", "ghost"],
+      "category": "Web"
+    },
+    {
+      "id": "seo-analytics",
+      "keywords": ["SEO", "search ranking", "keyword research", "organic traffic", "Google", "backlinks", "content strategy", "analytics"],
+      "tools": ["semrush", "ahrefs"],
+      "category": "Analytics"
+    }
+  ]
+}
