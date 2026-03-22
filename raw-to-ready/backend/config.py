@@ -54,6 +54,18 @@ AFFILIATE_LINKS = {
     "semrush":          "",
     "ahrefs":           "",
 
+    # FUNDRAISING & LEGAL
+    "carta":            "",
+    "angellist":        "",
+    "docsend":          "",
+    "clerky":           "",
+    "stripe_atlas":     "",
+    "statista":         "",
+
+    # BANKING
+    "mercury":          "",
+    "brex":             "",
+
 }
 
 # ============================================================

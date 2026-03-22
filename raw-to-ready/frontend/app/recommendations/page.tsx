@@ -4,7 +4,7 @@ import { Suspense, useEffect, useState } from "react";
 import { useAuth } from "@/components/auth-provider";
 import { AppNav } from "@/components/app-nav";
 import { CardSpotlight } from "@/components/ui/card-spotlight";
-import { api } from "@/lib/api";
+import { useProjects, useRecommendations } from "@/lib/hooks/use-api";
 import { motion } from "framer-motion";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Sparkles, ExternalLink, ArrowLeft } from "lucide-react";
@@ -39,11 +39,18 @@ function RecommendationsPage() {
   const searchParams = useSearchParams();
   const projectId = searchParams.get("project");
 
-  const [projects, setProjects] = useState<any[]>([]);
+  const { projects, isLoading: projectsLoading } = useProjects();
   const [selectedProject, setSelectedProject] = useState<string>(projectId || "");
-  const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
-  const [breadcrumbCount, setBreadcrumbCount] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const { data: recData, isLoading: recsLoading } = useRecommendations(selectedProject || null);
+  const recommendations = recData?.recommendations ?? [];
+  const breadcrumbCount = recData?.breadcrumb_count ?? 0;
+
+  // Auto-select first project if none selected
+  useEffect(() => {
+    if (!selectedProject && projects.length > 0) {
+      setSelectedProject(projects[0].id);
+    }
+  }, [projects, selectedProject]);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -51,31 +58,7 @@ function RecommendationsPage() {
     }
   }, [user, authLoading, router]);
 
-  useEffect(() => {
-    if (user) {
-      api.listProjects().then((data) => {
-        setProjects(data);
-        if (!selectedProject && data.length > 0) {
-          setSelectedProject(data[0].id);
-        }
-        setLoading(false);
-      });
-    }
-  }, [user, selectedProject]);
-
-  useEffect(() => {
-    if (selectedProject) {
-      setLoading(true);
-      api
-        .getRecommendations(selectedProject)
-        .then((data) => {
-          setRecommendations(data.recommendations || []);
-          setBreadcrumbCount(data.breadcrumb_count || 0);
-        })
-        .catch(console.error)
-        .finally(() => setLoading(false));
-    }
-  }, [selectedProject]);
+  const loading = projectsLoading || recsLoading;
 
   if (authLoading) {
     return (

@@ -65,6 +65,48 @@
       "keywords": ["SEO", "search ranking", "keyword research", "organic traffic", "Google", "backlinks", "content strategy", "analytics"],
       "tools": ["semrush", "ahrefs"],
       "category": "Analytics"
+    },
+    {
+      "id": "fundraising-investment",
+      "keywords": ["fundraising", "seed round", "series A", "angel investor", "venture capital", "VC", "pitch deck", "dilution", "cap table", "valuation", "convertible note", "SAFE", "runway", "equity"],
+      "tools": ["carta", "angellist", "docsend"],
+      "category": "Fundraising"
+    },
+    {
+      "id": "market-research",
+      "keywords": ["TAM", "SAM", "SOM", "market size", "market research", "total addressable market", "target market", "industry analysis", "customer segment", "market opportunity"],
+      "tools": ["semrush", "statista"],
+      "category": "Market Research"
+    },
+    {
+      "id": "expense-tracking",
+      "keywords": ["burn rate", "expenses", "operating costs", "overhead", "monthly spend", "cost structure", "budget", "fixed costs", "variable costs"],
+      "tools": ["quickbooks", "wave", "mercury", "brex"],
+      "category": "Expense Management"
+    },
+    {
+      "id": "customer-acquisition",
+      "keywords": ["CAC", "customer acquisition", "ad spend", "conversion rate", "LTV", "lifetime value", "paid ads", "growth marketing", "retention", "churn"],
+      "tools": ["hubspot", "mailchimp", "klaviyo"],
+      "category": "Growth"
+    },
+    {
+      "id": "banking-payments",
+      "keywords": ["business bank", "bank account", "payment processing", "wire transfer", "ACH", "corporate card", "business credit card"],
+      "tools": ["mercury", "brex", "stripe"],
+      "category": "Banking"
+    },
+    {
+      "id": "legal-compliance",
+      "keywords": ["LLC", "corporation", "trademark", "patent", "terms of service", "privacy policy", "legal", "compliance", "contract", "NDA"],
+      "tools": ["clerky", "stripe_atlas"],
+      "category": "Legal"
+    },
+    {
+      "id": "business-model",
+      "keywords": ["business model", "value proposition", "customer segment", "revenue stream", "cost structure", "key partners", "key activities", "key resources", "channels", "business canvas", "BMC", "lean canvas", "business plan"],
+      "tools": ["notion", "canva", "figma"],
+      "category": "Strategy"
     }
   ]
 }

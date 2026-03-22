@@ -9,6 +9,7 @@ function UnitEconomicsOutput({ formData }: { formData: Record<string, any> }) {
   const shipping = parseFloat(formData.shipping_cost) || 0;
   const returnRate = parseFloat(formData.return_rate) || 0;
   const cac = parseFloat(formData.cac) || 0;
+  const ltvMonths = parseInt(formData.ltv_months) || 12;
 
   if (!price) {
     return (
@@ -25,7 +26,7 @@ function UnitEconomicsOutput({ formData }: { formData: Record<string, any> }) {
   const contributionMargin = grossProfit - returnLoss - cac;
   const contributionPct = price > 0 ? (contributionMargin / price) * 100 : 0;
   const estimatedLTV =
-    contributionMargin > 0 ? contributionMargin * 12 : contributionMargin;
+    contributionMargin > 0 ? contributionMargin * ltvMonths : contributionMargin;
 
   const metrics = [
     {
@@ -41,9 +42,9 @@ function UnitEconomicsOutput({ formData }: { formData: Record<string, any> }) {
       color: contributionPct > 30 ? "text-green-400" : contributionPct > 0 ? "text-amber" : "text-red-400",
     },
     {
-      label: "Est. Annual LTV",
+      label: `Est. LTV (${ltvMonths}mo)`,
       value: `$${estimatedLTV.toFixed(0)}`,
-      amount: "Based on 12-month retention",
+      amount: `Based on ${ltvMonths}-month retention`,
       color: estimatedLTV > 0 ? "text-green-400" : "text-red-400",
     },
   ];
@@ -171,6 +172,17 @@ export default function UnitEconomicsPage() {
               placeholder="0.00"
             />
           </div>
+          <FormField
+            label="LTV Projection Length"
+            value={formData.ltv_months || "12"}
+            onChange={(v) => setField("ltv_months", v)}
+            type="number"
+            suffix="mo"
+            placeholder="12"
+            min={1}
+            max={60}
+            hint="Months to project lifetime value (1–60)"
+          />
         </div>
       )}
     </ToolLayout>

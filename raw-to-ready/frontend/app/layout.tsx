@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { DM_Sans, Syne } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/components/auth-provider";
+import { SWRProvider } from "@/lib/swr-provider";
 
 const syne = Syne({
   subsets: ["latin"],
@@ -32,7 +33,9 @@ export default function RootLayout({
         className={`${syne.variable} ${dmSans.variable} font-body antialiased bg-charcoal text-cream`}
       >
         <AuthProvider>
-          <div className="relative z-10 min-h-screen">{children}</div>
+          <SWRProvider>
+            <div className="relative z-10 min-h-screen">{children}</div>
+          </SWRProvider>
         </AuthProvider>
       </body>
     </html>

@@ -14,6 +14,16 @@ VALID_TOOLS = [
     "pricing_calculator",
     "supplier_matrix",
     "cash_flow",
+    "expense_tracker",
+    "fundraising",
+    "market_sizing",
+    "break_even",
+    "acquisition_planner",
+    "pl_statement",
+    "competitor_scorecard",
+    "scenario_planner",
+    "launch_checklist",
+    "business_model_canvas",
 ]
 
 

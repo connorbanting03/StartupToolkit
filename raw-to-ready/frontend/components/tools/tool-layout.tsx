@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "@/components/auth-provider";
 import { AppNav } from "@/components/app-nav";
 import { api } from "@/lib/api";
+import { useProjects, useToolInstances, invalidateProjects, invalidateProject } from "@/lib/hooks/use-api";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
@@ -51,9 +52,9 @@ export function ToolLayout({
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [projects, setProjects] = useState<any[]>([]);
+  const { projects } = useProjects();
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
-  const [instances, setInstances] = useState<ToolInstance[]>([]);
+  const { instances, mutate: mutateInstances } = useToolInstances(toolSlug, selectedProject);
   const [activeInstanceId, setActiveInstanceId] = useState<string | null>(null);
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [label, setLabel] = useState("");
@@ -88,32 +89,15 @@ export function ToolLayout({
     }
   }, [user, authLoading, router]);
 
-  useEffect(() => {
-    if (user) {
-      api.listProjects().then(setProjects).catch(console.error);
-    }
-  }, [user]);
-
-  const loadInstances = useCallback(async () => {
-    if (!selectedProject) return;
-    try {
-      const data = await api.getToolData(toolSlug, selectedProject);
-      setInstances(data);
-    } catch (err) {
-      console.error(err);
-    }
-  }, [selectedProject, toolSlug]);
-
-  // Load instances when project changes
+  // Reset form when project changes
   useEffect(() => {
     if (selectedProject) {
       setActiveInstanceId(null);
       setIsNew(false);
       setFormData({});
       setLabel("");
-      loadInstances();
     }
-  }, [selectedProject, loadInstances]);
+  }, [selectedProject]);
 
   const selectInstance = (inst: ToolInstance) => {
     setActiveInstanceId(inst.id);
@@ -152,7 +136,9 @@ export function ToolLayout({
         setLabel("");
         setIsNew(false);
       }
-      await loadInstances();
+      await mutateInstances();
+      invalidateProjects();
+      if (selectedProject) invalidateProject(selectedProject);
     } catch (err) {
       console.error("Delete failed:", err);
     } finally {
@@ -181,7 +167,9 @@ export function ToolLayout({
       setSaved(true);
       setNewKeywords(result.matched_keywords || []);
       setIsNew(false);
-      await loadInstances();
+      await mutateInstances();
+      invalidateProjects();
+      if (selectedProject) invalidateProject(selectedProject);
       setTimeout(() => setSaved(false), 3000);
     } catch (err) {
       console.error("Save failed:", err);

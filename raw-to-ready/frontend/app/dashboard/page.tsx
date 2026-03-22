@@ -6,6 +6,7 @@ import { AppNav } from "@/components/app-nav";
 import { CardSpotlight } from "@/components/ui/card-spotlight";
 import { Tabs } from "@/components/ui/tabs";
 import { api } from "@/lib/api";
+import { useProjects } from "@/lib/hooks/use-api";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -17,6 +18,16 @@ import {
   PiggyBank,
   Plus,
   Sparkles,
+  Receipt,
+  Rocket,
+  BarChart3,
+  Target,
+  Users,
+  FileText,
+  Swords,
+  GitBranch,
+  ClipboardCheck,
+  LayoutGrid,
 } from "lucide-react";
 
 const TOOLS = [
@@ -25,13 +36,22 @@ const TOOLS = [
   { name: "Pricing Strategy", slug: "pricing_calculator", path: "/tools/pricing-calculator", icon: DollarSign },
   { name: "Supplier Matrix", slug: "supplier_matrix", path: "/tools/supplier-matrix", icon: Truck },
   { name: "Cash Flow Forecast", slug: "cash_flow", path: "/tools/cash-flow", icon: PiggyBank },
+  { name: "Expense Tracker", slug: "expense_tracker", path: "/tools/expense-tracker", icon: Receipt },
+  { name: "Fundraising & Runway", slug: "fundraising", path: "/tools/fundraising", icon: Rocket },
+  { name: "Market Sizing", slug: "market_sizing", path: "/tools/market-sizing", icon: BarChart3 },
+  { name: "Break-Even Analyzer", slug: "break_even", path: "/tools/break-even", icon: Target },
+  { name: "Customer Acquisition", slug: "acquisition_planner", path: "/tools/acquisition-planner", icon: Users },
+  { name: "P&L Statement", slug: "pl_statement", path: "/tools/pl-statement", icon: FileText },
+  { name: "Competitor Scorecard", slug: "competitor_scorecard", path: "/tools/competitor-scorecard", icon: Swords },
+  { name: "Scenario Planner", slug: "scenario_planner", path: "/tools/scenario-planner", icon: GitBranch },
+  { name: "Launch Checklist", slug: "launch_checklist", path: "/tools/launch-checklist", icon: ClipboardCheck },
+  { name: "Business Model Canvas", slug: "business_model_canvas", path: "/tools/business-model-canvas", icon: LayoutGrid },
 ];
 
 export default function DashboardPage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
-  const [projects, setProjects] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { projects, isLoading: projectsLoading, mutate: mutateProjects } = useProjects();
   const [showNewProject, setShowNewProject] = useState(false);
   const [newProjectName, setNewProjectName] = useState("");
   const [newProjectDesc, setNewProjectDesc] = useState("");
@@ -43,23 +63,6 @@ export default function DashboardPage() {
     }
   }, [user, authLoading, router]);
 
-  useEffect(() => {
-    if (user) {
-      loadProjects();
-    }
-  }, [user]);
-
-  const loadProjects = async () => {
-    try {
-      const data = await api.listProjects();
-      setProjects(data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleCreateProject = async () => {
     if (!newProjectName.trim()) return;
     setCreating(true);
@@ -68,7 +71,7 @@ export default function DashboardPage() {
       setNewProjectName("");
       setNewProjectDesc("");
       setShowNewProject(false);
-      await loadProjects();
+      await mutateProjects();
     } catch (err) {
       console.error(err);
     } finally {
@@ -76,7 +79,9 @@ export default function DashboardPage() {
     }
   };
 
-  if (authLoading || loading) {
+  const loading = authLoading || projectsLoading;
+
+  if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-charcoal">
         <div className="h-6 w-6 animate-spin rounded-full border-2 border-amber border-t-transparent" />
@@ -205,8 +210,8 @@ export default function DashboardPage() {
 function ProjectCard({ project }: { project: any }) {
   const completedTools = project.completed_tools || [];
   const instanceCount = project.instance_count || 0;
-  const breadcrumbCount = project.breadcrumbs?.length || 0;
-  const progress = (completedTools.length / 5) * 100;
+  const totalTools = TOOLS.length;
+  const progress = (completedTools.length / totalTools) * 100;
 
   return (
     <motion.div
@@ -241,10 +246,9 @@ function ProjectCard({ project }: { project: any }) {
           <div className="mt-4">
             <div className="mb-1 flex justify-between text-xs text-muted">
               <span>
-                {instanceCount} {instanceCount === 1 ? "entry" : "entries"} across{" "}
-                {completedTools.length}/5 tools
+                {completedTools.length}/{totalTools} tools used
               </span>
-              <span>{breadcrumbCount} breadcrumbs</span>
+              <span>{instanceCount} {instanceCount === 1 ? "entry" : "entries"}</span>
             </div>
             <div className="h-1.5 w-full overflow-hidden rounded-full bg-charcoal-lighter">
               <motion.div

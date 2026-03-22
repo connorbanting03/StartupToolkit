@@ -3,7 +3,6 @@
 import { useAuth } from "@/components/auth-provider";
 import {
   LayoutDashboard,
-  Wrench,
   Sparkles,
   LogOut,
 } from "lucide-react";
@@ -23,11 +22,6 @@ export function AppNav() {
       name: "Dashboard",
       link: "/dashboard",
       icon: <LayoutDashboard className="h-4 w-4" />,
-    },
-    {
-      name: "Tools",
-      link: "/dashboard#tools",
-      icon: <Wrench className="h-4 w-4" />,
     },
     {
       name: "Recommendations",

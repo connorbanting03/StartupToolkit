@@ -20,6 +20,7 @@ function CashFlowOutput({ formData }: { formData: Record<string, any> }) {
   const variableCosts = parseFloat(formData.variable_costs) || 0;
   const oneTimeExpenses = parseFloat(formData.one_time_expenses) || 0;
   const paymentTerms = parseInt(formData.payment_terms) || 0;
+  const forecastMonths = parseInt(formData.forecast_months) || 12;
 
   if (!startingCash && !monthlyRevenue) {
     return (
@@ -34,7 +35,7 @@ function CashFlowOutput({ formData }: { formData: Record<string, any> }) {
   let runwayMonths: number | null = null;
   let firstProfitable: number | null = null;
 
-  for (let i = 1; i <= 12; i++) {
+  for (let i = 1; i <= forecastMonths; i++) {
     // Revenue delayed by payment terms
     const revenueIn = i > Math.ceil(paymentTerms / 30) ? monthlyRevenue : 0;
     const totalExpenses = fixedCosts + variableCosts + (i === 1 ? oneTimeExpenses : 0);
@@ -56,7 +57,9 @@ function CashFlowOutput({ formData }: { formData: Record<string, any> }) {
     });
   }
 
-  if (runwayMonths === null) runwayMonths = 12;
+  if (runwayMonths === null) runwayMonths = forecastMonths;
+
+  const lastMonth = months[months.length - 1];
 
   return (
     <div className="space-y-6">
@@ -75,13 +78,13 @@ function CashFlowOutput({ formData }: { formData: Record<string, any> }) {
           </p>
         </div>
         <div className="rounded-lg border border-white/[0.06] bg-charcoal-lighter p-4">
-          <p className="text-xs text-muted">End Balance (M12)</p>
+          <p className="text-xs text-muted">End Balance (M{forecastMonths})</p>
           <p
             className={`mt-1 font-display text-xl font-bold ${
-              (months[11]?.balance ?? 0) >= 0 ? "text-green-400" : "text-red-400"
+              (lastMonth?.balance ?? 0) >= 0 ? "text-green-400" : "text-red-400"
             }`}
           >
-            ${(months[11]?.balance ?? 0).toLocaleString()}
+            ${(lastMonth?.balance ?? 0).toLocaleString()}
           </p>
         </div>
       </div>
@@ -115,7 +118,7 @@ export default function CashFlowPage() {
     <ToolLayout
       toolName="Cash Flow Forecast"
       toolSlug="cash_flow"
-      description="Forecast 12 months of cash flow, runway, and first profitable month."
+      description="Forecast your cash flow, runway, and first profitable month."
       outputSection={CashFlowOutput}
     >
       {({ formData, setField }) => (
@@ -158,7 +161,7 @@ export default function CashFlowPage() {
               hint="Materials, shipping, commissions"
             />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <FormField
               label="One-time Expenses"
               value={formData.one_time_expenses || ""}
@@ -166,15 +169,27 @@ export default function CashFlowPage() {
               type="number"
               prefix="$"
               placeholder="0"
-              hint="Equipment, licenses, setup costs"
+              hint="Equipment, licenses, setup"
             />
             <FormField
-              label="Payment Terms (days)"
+              label="Payment Terms"
               value={formData.payment_terms || ""}
               onChange={(v) => setField("payment_terms", v)}
               type="number"
+              suffix="days"
               placeholder="30"
               hint="Days until you receive payment"
+            />
+            <FormField
+              label="Forecast Length"
+              value={formData.forecast_months || "12"}
+              onChange={(v) => setField("forecast_months", v)}
+              type="number"
+              suffix="mo"
+              placeholder="12"
+              min={1}
+              max={60}
+              hint="Months to forecast (1–60)"
             />
           </div>
         </div>
