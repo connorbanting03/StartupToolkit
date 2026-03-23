@@ -21,6 +21,8 @@ ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
 ENV NEXT_PUBLIC_API_URL=""
 
 RUN npm run build
+# Ensure public dir exists (Next.js standalone expects it)
+RUN mkdir -p .next/static public
 
 # ─────────────────────────────────────────────────────────────
 # Stage 2: Final runtime image (Python + Node)
