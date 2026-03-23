@@ -3,11 +3,11 @@ FROM python:3.12-slim
 WORKDIR /app
 
 # Install dependencies
-COPY backend/requirements.txt ./backend/requirements.txt
-RUN pip install --no-cache-dir -r backend/requirements.txt
+COPY raw-to-ready/backend/requirements.txt requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy app source
-COPY . .
+COPY raw-to-ready/backend ./backend
 
 # Expose port (Railway injects $PORT at runtime)
 EXPOSE 8000
