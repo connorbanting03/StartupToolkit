@@ -6,7 +6,7 @@
 AFFILIATE_LINKS = {
 
     # E-COMMERCE & SALES
-    "shopify":          "",   # https://shopify.pxf.io/your-link
+    "shopify":          "https://shopify.pxf.io/m4OXk1",
     "square":           "",
     "stripe":           "",
     "gumroad":          "",
@@ -68,14 +68,20 @@ AFFILIATE_LINKS = {
 
 }
 
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
 # ============================================================
 # SUPABASE CONFIG
+# Set SUPABASE_URL and SUPABASE_KEY as Railway environment variables
 # ============================================================
-SUPABASE_URL = "https://bmqxahnbwpbagonhnnqa.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJtcXhhaG5id3BiYWdvbmhubnFhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwNDk5MDcsImV4cCI6MjA4OTYyNTkwN30.Zlj5I-gpti4iy3IdLpAGbPuiwJHGo0LiJOnvNAV0He0"
+SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
+SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "")
 
 # ============================================================
 # APP CONFIG
 # ============================================================
-APP_NAME = "Raw to Ready"
-APP_ENV = "development"  # "development" | "production"
+APP_NAME = os.environ.get("APP_NAME", "Startup Blueprint Kit")
+APP_ENV = os.environ.get("APP_ENV", "production")  # "development" | "production"

@@ -34,7 +34,7 @@ export function AppNav() {
     <div className="fixed inset-x-0 top-4 z-50 mx-auto flex max-w-fit items-center gap-1 rounded-full border border-white/[0.08] bg-charcoal/80 px-2 py-2 shadow-lg backdrop-blur-md">
       <div className="flex items-center gap-1">
         <span className="px-3 font-display text-xs font-bold tracking-wider text-amber">
-          R→R
+          SBK
         </span>
         <div className="h-4 w-px bg-white/10" />
       </div>

@@ -17,9 +17,9 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Raw to Ready — From raw idea to ready to launch",
+  title: "Startup Blueprint Kit — Plan, build, and launch your business",
   description:
-    "Business tools that help founders go from raw idea to ready to launch. Financial calculators, supplier matrices, pricing tools, and smart recommendations.",
+    "Business planning tools that help founders plan, build, and launch. Financial calculators, supplier matrices, pricing tools, and smart recommendations.",
 };
 
 export default function RootLayout({

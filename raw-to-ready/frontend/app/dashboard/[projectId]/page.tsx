@@ -6,8 +6,22 @@ import { useAuth } from "@/components/auth-provider";
 import { AppNav } from "@/components/app-nav";
 import { api } from "@/lib/api";
 import { useProject, invalidateProjects } from "@/lib/hooks/use-api";
-import { motion, Reorder } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  useSortable,
+  rectSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import {
   ArrowLeft,
   TrendingUp,
@@ -31,6 +45,8 @@ import {
   GitBranch,
   ClipboardCheck,
   LayoutGrid,
+  Eye,
+  X,
 } from "lucide-react";
 import {
   LineChart,
@@ -628,43 +644,36 @@ const BMC_SECTIONS = [
 ];
 
 function BMCCard({ data }: { data: Record<string, any> }) {
-  const filled = BMC_SECTIONS.filter((s) => data[s.key]?.trim()).length;
-  if (filled === 0) return <p className="text-sm text-muted">Canvas is empty — open the tool to fill it out.</p>;
+  const filled = BMC_SECTIONS.filter((s) => data[s.key]?.trim());
+  const unfilled = BMC_SECTIONS.filter((s) => !data[s.key]?.trim());
+  if (filled.length === 0) return <p className="text-sm text-muted">Canvas is empty — open the tool to fill it out.</p>;
 
   return (
     <div className="space-y-3">
-      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
-        {BMC_SECTIONS.map((section) => {
-          const content = data[section.key] || "";
-          const lines = content.split("\n").map((l: string) => l.trim()).filter((l: string) => l);
-
-          return (
-            <div
-              key={section.key}
-              className="rounded-md border border-white/[0.06] bg-charcoal p-2.5"
-            >
-              <p className="mb-1.5 text-[9px] font-bold uppercase tracking-wider" style={{ color: section.color }}>
-                {section.label}
-              </p>
-              {lines.length > 0 ? (
-                <ul className="space-y-0.5">
-                  {lines.map((line: string, i: number) => (
-                    <li key={i} className="text-[10px] leading-snug text-cream/70">
-                      {line.replace(/^[-•]\s*/, "• ")}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-[9px] italic text-muted/30">Empty</p>
-              )}
-            </div>
-          );
-        })}
+      <div className="flex flex-wrap gap-1.5">
+        {filled.map((s) => (
+          <span
+            key={s.key}
+            className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium"
+            style={{ backgroundColor: s.color + "18", color: s.color }}
+          >
+            <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: s.color }} />
+            {s.label}
+          </span>
+        ))}
+        {unfilled.map((s) => (
+          <span
+            key={s.key}
+            className="inline-flex items-center gap-1 rounded-full border border-white/[0.06] px-2.5 py-1 text-[11px] text-muted/40"
+          >
+            {s.label}
+          </span>
+        ))}
       </div>
       <div className="flex items-center gap-3 text-[10px] text-muted">
-        <span>{filled}/9 sections</span>
+        <span>{filled.length}/9 sections</span>
         <span>•</span>
-        <span>{Math.round((filled / 9) * 100)}% complete</span>
+        <span>{Math.round((filled.length / 9) * 100)}% complete</span>
       </div>
     </div>
   );
@@ -708,7 +717,24 @@ export default function ProjectDashboard() {
   const [cardOrder, setCardOrder] = useState<string[]>([]);
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
-  const [collapsedCards, setCollapsedCards] = useState<Record<string, boolean>>({});
+  const [bmcModal, setBmcModal] = useState<Record<string, any> | null>(null);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    setCardOrder((prev) => {
+      const oldIdx = prev.indexOf(active.id as string);
+      const newIdx = prev.indexOf(over.id as string);
+      const next = [...prev];
+      next.splice(oldIdx, 1);
+      next.splice(newIdx, 0, active.id as string);
+      return next;
+    });
+  };
 
   const handleDelete = async (inst: ToolInstance) => {
     setDeleting(inst.id);
@@ -750,8 +776,6 @@ export default function ProjectDashboard() {
       }
     }
     setCardOrder([...instances].reverse().map((i) => i.id));
-    // BMC cards start expanded
-    setCollapsedCards({});
   }, [project?.tool_instances, projectId]);
 
   // Persist layout
@@ -864,7 +888,7 @@ export default function ProjectDashboard() {
           })}
         </div>
 
-        {/* Instance cards — reorderable, only filled-out ones */}
+        {/* Instance cards — sortable grid */}
         {instances.length === 0 ? (
           <motion.div
             initial={{ opacity: 0 }}
@@ -874,97 +898,209 @@ export default function ProjectDashboard() {
             <p className="text-sm text-muted">No entries yet. Use the buttons above to fill out your first tool.</p>
           </motion.div>
         ) : (
-          <Reorder.Group
-            axis="y"
-            values={cardOrder}
-            onReorder={setCardOrder}
-            className="space-y-4"
-          >
-            {cardOrder.map((instanceId) => {
-              const inst = instanceMap.get(instanceId);
-              if (!inst) return null;
-              const meta = TOOL_META[inst.tool_name];
-              if (!meta) return null;
-              const Icon = meta.icon;
-              const renderer = TOOL_RENDERERS[inst.tool_name];
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <SortableContext items={cardOrder} strategy={rectSortingStrategy}>
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                {cardOrder.map((instanceId) => {
+                  const inst = instanceMap.get(instanceId);
+                  if (!inst) return null;
+                  const meta = TOOL_META[inst.tool_name];
+                  if (!meta) return null;
+                  return (
+                    <SortableCard
+                      key={instanceId}
+                      id={instanceId}
+                      inst={inst}
+                      meta={meta}
+                      projectId={projectId}
+                      openMenu={openMenu}
+                      setOpenMenu={setOpenMenu}
+                      deleting={deleting}
+                      onDelete={handleDelete}
+                      onViewBMC={() => setBmcModal(inst.input_data)}
+                    />
+                  );
+                })}
+              </div>
+            </SortableContext>
+          </DndContext>
+        )}
+      </div>
 
-              return (
-                <Reorder.Item
-                  key={instanceId}
-                  value={instanceId}
-                  className="rounded-2xl border border-white/[0.08] bg-charcoal-light"
-                >
-                  <div className="flex items-center justify-between border-b border-white/[0.06] px-5 py-3">
-                    <div className="flex items-center gap-3">
-                      <GripVertical className="h-4 w-4 cursor-grab text-muted/40 active:cursor-grabbing" />
-                      <Icon className={`h-5 w-5 ${meta.color}`} />
-                      <div>
-                        <h3 className="font-display text-sm font-semibold text-cream">
-                          {inst.label || meta.name}
-                        </h3>
-                        {inst.label && (
-                          <p className="text-[10px] text-muted">{meta.name}</p>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      {inst.tool_name === "business_model_canvas" && (
-                        <button
-                          onClick={() => setCollapsedCards((prev) => ({ ...prev, [inst.id]: !prev[inst.id] }))}
-                          className="rounded-lg p-1.5 text-muted transition-colors hover:bg-white/[0.06] hover:text-cream"
-                        >
-                          <svg
-                            className={`h-4 w-4 transition-transform ${collapsedCards[inst.id] ? "-rotate-90" : ""}`}
-                            fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
-                          >
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                          </svg>
-                        </button>
-                      )}
-                      <div className="relative">
-                      <button
-                        onClick={() => setOpenMenu(openMenu === inst.id ? null : inst.id)}
-                        className="rounded-lg p-1.5 text-muted transition-colors hover:bg-white/[0.06] hover:text-cream"
+      {/* BMC Full Canvas Modal */}
+      <AnimatePresence>
+        {bmcModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+            onClick={() => setBmcModal(null)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              onClick={(e) => e.stopPropagation()}
+              className="relative max-h-[85vh] w-full max-w-4xl overflow-y-auto rounded-2xl border border-white/[0.08] bg-charcoal-light p-6"
+            >
+              <button
+                onClick={() => setBmcModal(null)}
+                className="absolute right-4 top-4 rounded-lg p-1.5 text-muted transition-colors hover:bg-white/[0.06] hover:text-cream"
+              >
+                <X className="h-5 w-5" />
+              </button>
+              <h2 className="mb-4 font-display text-lg font-bold text-cream">Business Model Canvas</h2>
+              <div
+                className="grid gap-2"
+                style={{
+                  gridTemplateColumns: "repeat(10, 1fr)",
+                  gridTemplateRows: "auto auto auto",
+                  gridTemplateAreas: `
+                    "kp kp ka ka vp vp cr cr cs cs"
+                    "kp kp kr kr vp vp ch ch cs cs"
+                    "cost cost cost cost cost rev rev rev rev rev"
+                  `,
+                }}
+              >
+                {BMC_SECTIONS.map((section) => {
+                  const content = bmcModal[section.key] || "";
+                  const lines = content.split("\n").map((l: string) => l.trim()).filter((l: string) => l);
+                  return (
+                    <div
+                      key={section.key}
+                      className="rounded-lg border border-white/[0.06] bg-charcoal p-3"
+                      style={{ gridArea: section.gridArea }}
+                    >
+                      <p
+                        className="mb-2 text-[10px] font-bold uppercase tracking-wider"
+                        style={{ color: section.color }}
                       >
-                        <MoreHorizontal className="h-4 w-4" />
-                      </button>
-                      {openMenu === inst.id && (
-                        <>
-                          <div className="fixed inset-0 z-10" onClick={() => setOpenMenu(null)} />
-                          <div className="absolute right-0 top-full z-20 mt-1 w-36 overflow-hidden rounded-xl border border-white/[0.08] bg-charcoal-lighter shadow-lg">
-                            <Link
-                              href={`${meta.path}?project=${projectId}&instance=${inst.id}`}
-                              className="flex w-full items-center gap-2 px-3 py-2 text-xs text-cream transition-colors hover:bg-white/[0.06]"
-                              onClick={() => setOpenMenu(null)}
-                            >
-                              <Pencil className="h-3 w-3" />
-                              Edit
-                            </Link>
-                            <button
-                              onClick={() => handleDelete(inst)}
-                              disabled={deleting === inst.id}
-                              className="flex w-full items-center gap-2 px-3 py-2 text-xs text-red-400 transition-colors hover:bg-red-400/10 disabled:opacity-50"
-                            >
-                              <Trash2 className="h-3 w-3" />
-                              {deleting === inst.id ? "Deleting..." : "Delete"}
-                            </button>
-                          </div>
-                        </>
+                        {section.label}
+                      </p>
+                      {lines.length > 0 ? (
+                        <ul className="space-y-1">
+                          {lines.map((line: string, i: number) => (
+                            <li key={i} className="text-xs leading-relaxed text-cream/80">
+                              {line.replace(/^[-•]\s*/, "• ")}
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="text-[10px] italic text-muted/40">Empty</p>
                       )}
                     </div>
-                    </div>
-                  </div>
-                  {(inst.tool_name !== "business_model_canvas" || !collapsedCards[inst.id]) && (
-                  <div className={`p-5 ${deleting === inst.id ? "opacity-40 pointer-events-none" : ""}`}>
-                    {renderer ? renderer(inst.input_data) : (
-                      <p className="text-sm text-muted">Unknown tool type.</p>
-                    )}
-                  </div>
-                  )}
-                </Reorder.Item>
-              );
-            })}
-          </Reorder.Group>
+                  );
+                })}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+// ─── Sortable Card Component ────────────────────────────────
+function SortableCard({
+  id,
+  inst,
+  meta,
+  projectId,
+  openMenu,
+  setOpenMenu,
+  deleting,
+  onDelete,
+  onViewBMC,
+}: {
+  id: string;
+  inst: ToolInstance;
+  meta: { name: string; icon: any; path: string; color: string };
+  projectId: string;
+  openMenu: string | null;
+  setOpenMenu: (id: string | null) => void;
+  deleting: string | null;
+  onDelete: (inst: ToolInstance) => void;
+  onViewBMC: () => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 10 : undefined,
+  };
+
+  const Icon = meta.icon;
+  const renderer = TOOL_RENDERERS[inst.tool_name];
+  const isBMC = inst.tool_name === "business_model_canvas";
+
+  return (
+    <div ref={setNodeRef} style={style} className="rounded-2xl border border-white/[0.08] bg-charcoal-light">
+      <div className="flex items-center justify-between border-b border-white/[0.06] px-5 py-3">
+        <div className="flex items-center gap-3">
+          <button {...attributes} {...listeners} className="cursor-grab touch-none text-muted/40 active:cursor-grabbing">
+            <GripVertical className="h-4 w-4" />
+          </button>
+          <Icon className={`h-5 w-5 ${meta.color}`} />
+          <div>
+            <Link
+              href={`${meta.path}?project=${projectId}&instance=${inst.id}`}
+              className="font-display text-sm font-semibold text-cream transition-colors hover:text-amber"
+            >
+              {inst.label || meta.name}
+            </Link>
+            {inst.label && (
+              <p className="text-[10px] text-muted">{meta.name}</p>
+            )}
+          </div>
+        </div>
+        <div className="flex items-center gap-1">
+          {isBMC && (
+            <button
+              onClick={onViewBMC}
+              className="rounded-lg p-1.5 text-muted transition-colors hover:bg-white/[0.06] hover:text-cream"
+              title="View full canvas"
+            >
+              <Eye className="h-4 w-4" />
+            </button>
+          )}
+          <div className="relative">
+            <button
+              onClick={() => setOpenMenu(openMenu === inst.id ? null : inst.id)}
+              className="rounded-lg p-1.5 text-muted transition-colors hover:bg-white/[0.06] hover:text-cream"
+            >
+              <MoreHorizontal className="h-4 w-4" />
+            </button>
+            {openMenu === inst.id && (
+              <>
+                <div className="fixed inset-0 z-10" onClick={() => setOpenMenu(null)} />
+                <div className="absolute right-0 top-full z-20 mt-1 w-36 overflow-hidden rounded-xl border border-white/[0.08] bg-charcoal-lighter shadow-lg">
+                  <Link
+                    href={`${meta.path}?project=${projectId}&instance=${inst.id}`}
+                    className="flex w-full items-center gap-2 px-3 py-2 text-xs text-cream transition-colors hover:bg-white/[0.06]"
+                    onClick={() => setOpenMenu(null)}
+                  >
+                    <Pencil className="h-3 w-3" />
+                    Edit
+                  </Link>
+                  <button
+                    onClick={() => onDelete(inst)}
+                    disabled={deleting === inst.id}
+                    className="flex w-full items-center gap-2 px-3 py-2 text-xs text-red-400 transition-colors hover:bg-red-400/10 disabled:opacity-50"
+                  >
+                    <Trash2 className="h-3 w-3" />
+                    {deleting === inst.id ? "Deleting..." : "Delete"}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+      <div className={`p-5 ${deleting === inst.id ? "opacity-40 pointer-events-none" : ""}`}>
+        {renderer ? renderer(inst.input_data) : (
+          <p className="text-sm text-muted">Unknown tool type.</p>
         )}
       </div>
     </div>

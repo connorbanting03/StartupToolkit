@@ -38,10 +38,10 @@ export default function LoginPage() {
           {/* Logo */}
           <div className="mb-8 text-center">
             <h1 className="font-display text-2xl font-bold tracking-tight">
-              Raw to Ready
+              Startup Blueprint Kit
             </h1>
             <p className="mt-2 text-sm text-muted">
-              From raw idea to ready to launch
+              Plan, build, and launch your business
             </p>
           </div>
 

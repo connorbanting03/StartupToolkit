@@ -16,10 +16,10 @@ export default function Home() {
         transition={{ duration: 0.8, ease: "easeOut" }}
         className="relative z-10 mx-auto max-w-3xl text-center"
       >
-        {/* Raw → Ready transformation indicator */}
+        {/* Startup → Launch transformation indicator */}
         <div className="mb-8 flex items-center justify-center gap-4">
           <span className="font-display text-sm uppercase tracking-[0.3em] text-muted">
-            raw
+            startup
           </span>
           <div className="relative h-px w-24">
             <div className="absolute inset-0 bg-gradient-to-r from-muted/40 via-amber to-cream/60" />
@@ -34,14 +34,14 @@ export default function Home() {
             />
           </div>
           <span className="font-display text-sm uppercase tracking-[0.3em] text-cream">
-            ready
+            launch
           </span>
         </div>
 
         <h1 className="font-display text-5xl font-bold leading-tight tracking-tight md:text-7xl">
-          From{" "}
-          <span className="text-muted/60">raw idea</span> to{" "}
-          <span className="text-amber">ready to launch</span>
+          The blueprint kit for{" "}
+          <span className="text-muted/60">your startup</span> —{" "}
+          <span className="text-amber">launch-ready</span>
         </h1>
 
         <p className="mx-auto mt-6 max-w-xl font-body text-lg leading-relaxed text-muted">

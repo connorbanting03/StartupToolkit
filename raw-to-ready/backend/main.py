@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+import os
 
 from backend.config import APP_NAME, APP_ENV
 from backend.routers import projects, tools, recommendations, auth
@@ -11,12 +12,17 @@ app = FastAPI(
     redoc_url=None,
 )
 
+# ALLOWED_ORIGINS env var: comma-separated list of allowed origins
+# e.g. "https://my-frontend.railway.app,https://startupblueprintkit.com"
+_origins_env = os.environ.get("ALLOWED_ORIGINS", "")
+allowed_origins = [
+    "http://localhost:3000",
+    *[o.strip() for o in _origins_env.split(",") if o.strip()],
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "https://rawtoready.co",
-    ],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
