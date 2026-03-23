@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { Suspense, useState, useEffect } from "react";
 import { useAuth } from "@/components/auth-provider";
 import { AppNav } from "@/components/app-nav";
 import { api } from "@/lib/api";
@@ -42,7 +42,21 @@ interface ToolLayoutProps {
   }) => React.ReactNode;
 }
 
-export function ToolLayout({
+export function ToolLayout(props: ToolLayoutProps) {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center bg-charcoal">
+          <div className="h-6 w-6 animate-spin rounded-full border-2 border-amber border-t-transparent" />
+        </div>
+      }
+    >
+      <ToolLayoutInner {...props} />
+    </Suspense>
+  );
+}
+
+function ToolLayoutInner({
   toolName,
   toolSlug,
   description,
