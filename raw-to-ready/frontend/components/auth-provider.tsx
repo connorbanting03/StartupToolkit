@@ -28,11 +28,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-
+    // Use onAuthStateChange as single source of truth — it fires
+    // INITIAL_SESSION first, then SIGNED_IN / TOKEN_REFRESHED / SIGNED_OUT.
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {

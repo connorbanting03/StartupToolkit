@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { SWRConfig } from "swr";
 
 function localStorageProvider() {
@@ -34,14 +35,17 @@ function localStorageProvider() {
 }
 
 export function SWRProvider({ children }: { children: React.ReactNode }) {
+  const config = useMemo(
+    () => ({
+      provider: localStorageProvider,
+      revalidateOnFocus: false,
+      dedupingInterval: 5000,
+    }),
+    []
+  );
+
   return (
-    <SWRConfig
-      value={{
-        provider: localStorageProvider,
-        revalidateOnFocus: true,
-        dedupingInterval: 5000,
-      }}
-    >
+    <SWRConfig value={config}>
       {children}
     </SWRConfig>
   );
