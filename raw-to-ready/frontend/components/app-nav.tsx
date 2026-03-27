@@ -6,16 +6,21 @@ import {
   Sparkles,
   LogOut,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 export function AppNav() {
   const { user, signOut } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
 
   const handleSignOut = async () => {
     await signOut();
     router.push("/");
   };
+
+  // Extract project ID if currently on /dashboard/[projectId]
+  const projectMatch = pathname.match(/^\/dashboard\/([^/]+)$/);
+  const currentProjectId = projectMatch?.[1] ?? null;
 
   const navItems = [
     {
@@ -25,7 +30,7 @@ export function AppNav() {
     },
     {
       name: "Recommendations",
-      link: "/recommendations",
+      link: currentProjectId ? `/recommendations?project=${currentProjectId}` : "/recommendations",
       icon: <Sparkles className="h-4 w-4" />,
     },
   ];
