@@ -71,7 +71,7 @@ export default function DashboardPage() {
       setNewProjectName("");
       setNewProjectDesc("");
       setShowNewProject(false);
-      await mutateProjects();
+      await mutateProjects(undefined, { revalidate: true });
     } catch (err) {
       console.error(err);
     } finally {
