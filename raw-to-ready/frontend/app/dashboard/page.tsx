@@ -214,10 +214,7 @@ function ProjectCard({ project }: { project: any }) {
   const progress = (completedTools.length / totalTools) * 100;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-    >
+    <div>
       <Link href={`/dashboard/${project.id}`}>
         <CardSpotlight className="cursor-pointer transition-all hover:border-amber/20">
           <div className="flex items-start justify-between">
@@ -251,11 +248,9 @@ function ProjectCard({ project }: { project: any }) {
               <span>{instanceCount} {instanceCount === 1 ? "entry" : "entries"}</span>
             </div>
             <div className="h-1.5 w-full overflow-hidden rounded-full bg-charcoal-lighter">
-              <motion.div
-                className="h-full rounded-full bg-gradient-to-r from-amber/60 to-amber"
-                initial={{ width: 0 }}
-                animate={{ width: `${progress}%` }}
-                transition={{ duration: 0.8, delay: 0.2 }}
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-amber/60 to-amber transition-[width] duration-500"
+                style={{ width: `${progress}%` }}
               />
             </div>
           </div>
@@ -277,6 +272,6 @@ function ProjectCard({ project }: { project: any }) {
           </div>
         </CardSpotlight>
       </Link>
-    </motion.div>
+    </div>
   );
 }

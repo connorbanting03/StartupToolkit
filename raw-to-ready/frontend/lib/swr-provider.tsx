@@ -8,7 +8,8 @@ export function SWRProvider({ children }: { children: React.ReactNode }) {
       value={{
         revalidateOnFocus: false,
         revalidateOnReconnect: false,
-        dedupingInterval: 10000,
+        revalidateIfStale: false,
+        dedupingInterval: 30000,
       }}
     >
       {children}
