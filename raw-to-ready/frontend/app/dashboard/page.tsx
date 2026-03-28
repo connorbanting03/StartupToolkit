@@ -217,7 +217,9 @@ export default function DashboardPage() {
 
             {/* Project list */}
             {projects.map((project) => (
-              <ProjectCard key={project.id} project={project} />
+              <div key={project.id} className="mt-4">
+                <ProjectCard project={project} />
+              </div>
             ))}
           </div>
         )}
