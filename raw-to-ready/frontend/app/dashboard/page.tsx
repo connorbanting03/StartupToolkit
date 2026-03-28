@@ -216,11 +216,11 @@ export default function DashboardPage() {
             )}
 
             {/* Project list */}
-            {projects.map((project) => (
-              <div key={project.id} className="mt-4">
-                <ProjectCard project={project} />
-              </div>
-            ))}
+            <div className="flex flex-col gap-4">
+              {projects.map((project) => (
+                <ProjectCard key={project.id} project={project} />
+              ))}
+            </div>
           </div>
         )}
 
