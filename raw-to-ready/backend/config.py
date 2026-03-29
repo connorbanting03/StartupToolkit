@@ -7,6 +7,7 @@ AFFILIATE_LINKS = {
 
     # E-COMMERCE & SALES
     "shopify":          "https://shopify.pxf.io/m4OXk1",
+    "smartli":          "https://smartli.partnerlinks.io/xlrh66cre7hl",
     "square":           "",
     "stripe":           "",
     "gumroad":          "",

@@ -10,6 +10,7 @@ _map_path = Path(__file__).resolve().parent.parent / "data" / "keyword_tool_map.
 
 TOOL_DESCRIPTIONS: Dict[str, str] = {
     "shopify":      "Start your online store free, then just $1/month to keep building. Shopify powers over 1M businesses with everything from storefronts to payments to shipping — all in one place. Plus, earn up to $13,000 in credits as you grow.",
+    "smartli":      "AI-powered copywriting built for ecommerce. Smartli writes high-converting product descriptions, SEO blogs, and ads in seconds — so you can launch faster and rank higher without hiring a copywriter.",
     "railway":      "Deploy your backend, frontend, or database in minutes — no DevOps required. Railway auto-scales with your business, so you only pay for what you use. The fastest way to go from code to production.",
     "stripe":       "Accept payments online or in person. Stripe handles billing, subscriptions, invoicing, and fraud detection so you can focus on building.",
     "notion":       "One workspace for docs, databases, wikis, and project management. Replace five tools with one and keep your whole team aligned.",
@@ -23,6 +24,7 @@ TOOL_DESCRIPTIONS: Dict[str, str] = {
 
 TOOL_DISPLAY_NAMES: Dict[str, str] = {
     "shopify": "Shopify",
+    "smartli": "Smartli",
     "square": "Square",
     "stripe": "Stripe",
     "gumroad": "Gumroad",

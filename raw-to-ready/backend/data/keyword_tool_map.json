@@ -1,9 +1,15 @@
 {
   "mappings": [
     {
+      "id": "ecommerce-copywriting",
+      "keywords": ["product description", "copywriting", "product copy", "SEO content", "ad copy", "marketing copy", "blog post", "content writing", "ecommerce content", "product listing", "conversion copy", "Google ads", "Facebook ads", "meta description", "AI writing", "content marketing"],
+      "tools": ["smartli", "canva"],
+      "category": "Copywriting & Content"
+    },
+    {
       "id": "ecommerce-shopify",
       "keywords": ["shopify", "online store", "ecommerce", "e-commerce", "product sales", "sell online", "storefront", "drop shipping", "dropshipping", "physical product", "merchandise"],
-      "tools": ["shopify", "square", "stripe"],
+      "tools": ["shopify", "smartli", "square", "stripe"],
       "category": "E-Commerce"
     },
     {
