@@ -8,6 +8,19 @@ from backend.models.recommendation import RecommendedTool
 
 _map_path = Path(__file__).resolve().parent.parent / "data" / "keyword_tool_map.json"
 
+TOOL_DESCRIPTIONS: Dict[str, str] = {
+    "shopify":      "Start your online store free, then just $1/month to keep building. Shopify powers over 1M businesses with everything from storefronts to payments to shipping — all in one place. Plus, earn up to $13,000 in credits as you grow.",
+    "railway":      "Deploy your backend, frontend, or database in minutes — no DevOps required. Railway auto-scales with your business, so you only pay for what you use. The fastest way to go from code to production.",
+    "stripe":       "Accept payments online or in person. Stripe handles billing, subscriptions, invoicing, and fraud detection so you can focus on building.",
+    "notion":       "One workspace for docs, databases, wikis, and project management. Replace five tools with one and keep your whole team aligned.",
+    "hubspot":      "Free CRM to manage your leads, deals, and customer emails in one place. Scales from solo founder to full sales team without switching tools.",
+    "mailchimp":    "Send beautiful email campaigns and automated sequences to grow your audience. The free plan covers up to 500 contacts — ideal for early-stage businesses.",
+    "quickbooks":   "Track income, expenses, and taxes automatically. Connects to your bank accounts and generates P&L reports in seconds.",
+    "mercury":      "Business banking built for startups. No fees, no minimums, and a clean dashboard that integrates with your accounting tools.",
+    "canva":        "Design professional logos, social posts, pitch decks, and marketing materials — no design experience needed. Thousands of templates ready to go.",
+    "webflow":      "Build fast, SEO-optimised websites visually without writing code. Includes CMS, hosting, and e-commerce out of the box.",
+}
+
 TOOL_DISPLAY_NAMES: Dict[str, str] = {
     "shopify": "Shopify",
     "square": "Square",
@@ -88,6 +101,7 @@ def build_recommendations(breadcrumbs: List[dict]) -> List[RecommendedTool]:
             tool_name=TOOL_DISPLAY_NAMES.get(tool_key, tool_key.title()),
             category=tool_categories.get(tool_key, "General"),
             reason=reasons[0],  # Primary reason
+            description=TOOL_DESCRIPTIONS.get(tool_key, ""),
             affiliate_link=link,
             has_link=bool(link),
         ))

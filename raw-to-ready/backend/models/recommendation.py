@@ -7,6 +7,7 @@ class RecommendedTool(BaseModel):
     tool_name: str
     category: str
     reason: str
+    description: str = ""
     affiliate_link: str
     has_link: bool
 

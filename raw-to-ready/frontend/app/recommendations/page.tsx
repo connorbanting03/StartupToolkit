@@ -15,6 +15,7 @@ interface Recommendation {
   tool_name: string;
   category: string;
   reason: string;
+  description: string;
   affiliate_link: string;
   has_link: boolean;
 }
@@ -170,9 +171,15 @@ function RecommendationsPage() {
                           {rec.tool_name}
                         </h3>
 
-                        <p className="mt-1 flex-1 text-xs leading-relaxed text-muted">
+                        <p className="mt-1 text-xs leading-relaxed text-amber/80">
                           {rec.reason}
                         </p>
+
+                        {rec.description && (
+                          <p className="mt-2 flex-1 text-xs leading-relaxed text-muted">
+                            {rec.description}
+                          </p>
+                        )}
 
                         {/* CTA */}
                         <div className="mt-4">
