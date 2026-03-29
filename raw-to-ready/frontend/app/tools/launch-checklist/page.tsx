@@ -1,7 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import { ToolLayout } from "@/components/tools/tool-layout";
-import { FormField, SelectField, TextAreaField } from "@/components/tools/form-fields";
+import { TextAreaField } from "@/components/tools/form-fields";
+import { ExternalLink, Copy, Check, Sparkles, Upload } from "lucide-react";
+
+const CLAUDE_URL = "https://claude.ai/new";
 
 const CATEGORIES = [
   {
@@ -138,7 +142,47 @@ function LaunchOutput({ formData }: { formData: Record<string, any> }) {
   );
 }
 
+const ALL_ITEM_KEYS = CATEGORIES.flatMap((c) => c.items.map((i) => i.key));
+
+function generatePrompt(businessName: string, businessDesc: string): string {
+  const allItems = CATEGORIES.flatMap((c) =>
+    c.items.map((i) => `- ${i.key}: ${i.label}`)
+  ).join("\n");
+
+  return `I'm preparing a launch checklist for my startup${businessName ? ` called "${businessName}"` : ""}.${businessDesc ? ` Here's what we do: ${businessDesc}` : ""}
+
+Below is a list of possible launch items. For each one, respond with the item key followed by YES or NO based on whether it's relevant for my business at launch. Return EXACTLY this format — one per line, no extra text:
+
+${allItems}
+
+Example format:
+register_business: YES
+ein: YES
+business_license: NO
+
+Return every item with YES or NO. Be honest — mark NO for items that aren't relevant to my specific business type.`;
+}
+
+function parseClaudeOutput(text: string): Record<string, string> {
+  const result: Record<string, string> = {};
+  const keySet = new Set(ALL_ITEM_KEYS);
+
+  for (const line of text.split("\n")) {
+    const match = line.match(/^\s*[-•]?\s*(\w+)\s*:\s*(YES|NO)/i);
+    if (match && keySet.has(match[1])) {
+      result[match[1]] = match[2].toUpperCase() === "YES" ? "true" : "false";
+    }
+  }
+
+  return result;
+}
+
 export default function LaunchChecklistPage() {
+  const [copied, setCopied] = useState(false);
+  const [showImport, setShowImport] = useState(false);
+  const [importText, setImportText] = useState("");
+  const [importError, setImportError] = useState("");
+
   return (
     <ToolLayout
       toolName="Launch Checklist"
@@ -146,9 +190,86 @@ export default function LaunchChecklistPage() {
       description="Track everything you need to do before launching your startup."
       outputSection={LaunchOutput}
     >
-      {({ formData, setField }) => (
-        <div className="space-y-6">
-          {CATEGORIES.map((cat) => (
+      {({ formData, setField }) => {
+        const businessName = formData.business_name || "";
+        const businessDesc = formData.business_description || "";
+        const prompt = generatePrompt(businessName, businessDesc);
+
+        const handleCopyPrompt = async () => {
+          await navigator.clipboard.writeText(prompt);
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000);
+        };
+
+        const handleImport = () => {
+          const parsed = parseClaudeOutput(importText);
+          const keys = Object.keys(parsed);
+          if (keys.length === 0) {
+            setImportError("Couldn't parse any items. Make sure the output uses item_key: YES/NO format.");
+            return;
+          }
+          setImportError("");
+          keys.forEach((key) => setField(key, parsed[key]));
+          setShowImport(false);
+          setImportText("");
+        };
+
+        return (
+          <div className="space-y-6">
+            {/* Claude Integration Banner */}
+            <div className="rounded-xl border border-amber/20 bg-amber/5 p-4">
+              <div className="mb-3 flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-amber" />
+                <p className="text-sm font-medium text-cream">Auto-fill with Claude</p>
+              </div>
+              <p className="mb-3 text-xs leading-relaxed text-muted">
+                Let Claude figure out which launch items apply to your specific business type. Add your business details, copy the prompt, paste it in Claude, then import the response to auto-check relevant items.
+              </p>
+
+              <div className="mb-3 space-y-3">
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium text-muted">Business Name (for prompt)</label>
+                  <input type="text" value={businessName} onChange={(e) => setField("business_name", e.target.value)} placeholder="e.g. My Startup" className="w-full rounded-lg border border-white/[0.06] bg-charcoal px-3 py-2 text-sm text-cream placeholder:text-muted/40 focus:border-amber/40 focus:outline-none" />
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium text-muted">Brief Description (for prompt)</label>
+                  <textarea value={businessDesc} onChange={(e) => setField("business_description", e.target.value)} placeholder="e.g. An online marketplace for local artisan goods..." rows={2} className="w-full rounded-lg border border-white/[0.06] bg-charcoal px-3 py-2 text-sm text-cream placeholder:text-muted/40 focus:border-amber/40 focus:outline-none" />
+                </div>
+              </div>
+
+              <div className="mb-3 max-h-32 overflow-y-auto rounded-lg border border-white/[0.06] bg-charcoal p-3">
+                <pre className="whitespace-pre-wrap text-[11px] leading-relaxed text-muted/70">{prompt}</pre>
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                <button onClick={handleCopyPrompt} className="flex items-center gap-1.5 rounded-lg border border-white/[0.06] bg-charcoal px-3 py-1.5 text-xs font-medium text-cream transition hover:border-amber/30">
+                  {copied ? <Check className="h-3 w-3 text-green-400" /> : <Copy className="h-3 w-3" />}
+                  {copied ? "Copied!" : "Copy Prompt"}
+                </button>
+                <a href={CLAUDE_URL} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 rounded-lg bg-amber px-3 py-1.5 text-xs font-medium text-charcoal transition hover:bg-amber/90">
+                  Open Claude
+                  <ExternalLink className="h-3 w-3" />
+                </a>
+                <button onClick={() => setShowImport(!showImport)} className="flex items-center gap-1.5 rounded-lg border border-amber/30 px-3 py-1.5 text-xs font-medium text-amber transition hover:bg-amber/10">
+                  <Upload className="h-3 w-3" />
+                  Import Response
+                </button>
+              </div>
+
+              {showImport && (
+                <div className="mt-3 space-y-2 rounded-lg border border-white/[0.06] bg-charcoal p-3">
+                  <p className="text-xs text-muted">Paste Claude&apos;s response below and click Import:</p>
+                  <textarea value={importText} onChange={(e) => { setImportText(e.target.value); setImportError(""); }} rows={8} placeholder="Paste the full Claude response here..." className="w-full rounded-lg border border-white/[0.06] bg-charcoal-lighter px-3 py-2 text-xs text-cream placeholder:text-muted/40 focus:border-amber/40 focus:outline-none" />
+                  {importError && <p className="text-xs text-red-400">{importError}</p>}
+                  <button onClick={handleImport} disabled={!importText.trim()} className="rounded-lg bg-amber px-4 py-1.5 text-xs font-medium text-charcoal transition hover:bg-amber/90 disabled:opacity-40">
+                    Import & Check Items
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Checklist Categories */}
+            {CATEGORIES.map((cat) => (
             <div key={cat.name}>
               <p className="mb-2 text-xs font-medium" style={{ color: cat.color }}>{cat.name}</p>
               <div className="space-y-2">
@@ -176,7 +297,8 @@ export default function LaunchChecklistPage() {
             placeholder="Additional notes, blockers, dependencies..."
           />
         </div>
-      )}
+        );
+      }}
     </ToolLayout>
   );
 }
