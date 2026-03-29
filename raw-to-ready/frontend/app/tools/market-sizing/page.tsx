@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import { ToolLayout } from "@/components/tools/tool-layout";
 import { FormField, SelectField, TextAreaField } from "@/components/tools/form-fields";
+import { ExternalLink, Copy, Check, Sparkles, Upload } from "lucide-react";
 import {
   BarChart,
   Bar,
@@ -11,6 +13,8 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+
+const CLAUDE_URL = "https://claude.ai/new";
 
 const CHART_STYLES = {
   backgroundColor: "#1e1e1e",
@@ -114,7 +118,55 @@ function MarketOutput({ formData }: { formData: Record<string, any> }) {
 // Need to import Cell for the bar chart
 import { Cell } from "recharts";
 
+function generatePrompt(businessName: string, businessDesc: string): string {
+  return `I'm doing market sizing for my business${businessName ? ` called "${businessName}"` : ""}.${businessDesc ? ` Here's what we do: ${businessDesc}` : ""}
+
+Please estimate my market size and return EXACTLY this format — no extra text before or after:
+
+target_market: [2-3 sentence description of my target market]
+tam: [Total Addressable Market in dollars, numbers only e.g. 5000000000]
+total_customers_in_market: [estimated total potential customers, numbers only]
+avg_revenue_per_customer: [average annual revenue per customer in dollars, numbers only]
+sam_percent: [what % of TAM I can realistically serve, numbers only e.g. 25]
+som_percent: [what % of SAM I can capture in 1-3 years, numbers only e.g. 8]
+
+Be specific to my industry and business type. Use real market data where possible. Only return the formatted data.`;
+}
+
+function parseClaudeOutput(text: string): Record<string, string> {
+  const result: Record<string, string> = {};
+  const fieldMap: Record<string, string> = {
+    target_market: "target_market",
+    tam: "tam",
+    total_customers_in_market: "total_customers_in_market",
+    avg_revenue_per_customer: "avg_revenue_per_customer",
+    sam_percent: "sam_percent",
+    som_percent: "som_percent",
+  };
+
+  for (const line of text.split("\n")) {
+    const match = line.match(/^\s*([\w_]+)\s*:\s*(.+)/);
+    if (match) {
+      const key = match[1].toLowerCase();
+      let value = match[2].trim();
+      if (fieldMap[key]) {
+        if (key !== "target_market") {
+          value = value.replace(/[^0-9.]/g, "");
+        }
+        result[fieldMap[key]] = value;
+      }
+    }
+  }
+
+  return result;
+}
+
 export default function MarketSizingPage() {
+  const [copied, setCopied] = useState(false);
+  const [showImport, setShowImport] = useState(false);
+  const [importText, setImportText] = useState("");
+  const [importError, setImportError] = useState("");
+
   return (
     <ToolLayout
       toolName="Market Sizing"
@@ -122,9 +174,76 @@ export default function MarketSizingPage() {
       description="Estimate your Total Addressable Market (TAM), Serviceable Market (SAM), and Obtainable Market (SOM)."
       outputSection={MarketOutput}
     >
-      {({ formData, setField }) => (
-        <div className="space-y-4">
-          <SelectField
+      {({ formData, setField }) => {
+        const businessName = formData.business_name || "";
+        const businessDesc = formData.business_description || "";
+        const prompt = generatePrompt(businessName, businessDesc);
+
+        const handleCopyPrompt = async () => {
+          await navigator.clipboard.writeText(prompt);
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000);
+        };
+
+        const handleImport = () => {
+          const parsed = parseClaudeOutput(importText);
+          if (Object.keys(parsed).length === 0) {
+            setImportError("Couldn't parse any fields. Make sure the output uses field_name: value format.");
+            return;
+          }
+          setImportError("");
+          Object.entries(parsed).forEach(([key, val]) => setField(key, val));
+          setShowImport(false);
+          setImportText("");
+        };
+
+        return (
+          <div className="space-y-4">
+            {/* Claude Integration Banner */}
+            <div className="rounded-xl border border-amber/20 bg-amber/5 p-4">
+              <div className="mb-3 flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-amber" />
+                <p className="text-sm font-medium text-cream">Auto-fill with Claude</p>
+              </div>
+              <p className="mb-3 text-xs leading-relaxed text-muted">
+                Let Claude estimate your TAM, SAM, and SOM based on real market data for your industry.
+              </p>
+              <div className="mb-3 space-y-3">
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium text-muted">Business Name</label>
+                  <input type="text" value={businessName} onChange={(e) => setField("business_name", e.target.value)} placeholder="e.g. My Startup" className="w-full rounded-lg border border-white/[0.06] bg-charcoal px-3 py-2 text-sm text-cream placeholder:text-muted/40 focus:border-amber/40 focus:outline-none" />
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium text-muted">Brief Description</label>
+                  <textarea value={businessDesc} onChange={(e) => setField("business_description", e.target.value)} placeholder="e.g. We sell premium organic coffee beans DTC in the US..." rows={2} className="w-full rounded-lg border border-white/[0.06] bg-charcoal px-3 py-2 text-sm text-cream placeholder:text-muted/40 focus:border-amber/40 focus:outline-none" />
+                </div>
+              </div>
+              <div className="mb-3 max-h-32 overflow-y-auto rounded-lg border border-white/[0.06] bg-charcoal p-3">
+                <pre className="whitespace-pre-wrap text-[11px] leading-relaxed text-muted/70">{prompt}</pre>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <button onClick={handleCopyPrompt} className="flex items-center gap-1.5 rounded-lg border border-white/[0.06] bg-charcoal px-3 py-1.5 text-xs font-medium text-cream transition hover:border-amber/30">
+                  {copied ? <Check className="h-3 w-3 text-green-400" /> : <Copy className="h-3 w-3" />}
+                  {copied ? "Copied!" : "Copy Prompt"}
+                </button>
+                <a href={CLAUDE_URL} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 rounded-lg bg-amber px-3 py-1.5 text-xs font-medium text-charcoal transition hover:bg-amber/90">
+                  Open Claude <ExternalLink className="h-3 w-3" />
+                </a>
+                <button onClick={() => setShowImport(!showImport)} className="flex items-center gap-1.5 rounded-lg border border-amber/30 px-3 py-1.5 text-xs font-medium text-amber transition hover:bg-amber/10">
+                  <Upload className="h-3 w-3" /> Import Response
+                </button>
+              </div>
+              {showImport && (
+                <div className="mt-3 space-y-2 rounded-lg border border-white/[0.06] bg-charcoal p-3">
+                  <p className="text-xs text-muted">Paste Claude&apos;s response below:</p>
+                  <textarea value={importText} onChange={(e) => { setImportText(e.target.value); setImportError(""); }} rows={6} placeholder="Paste here..." className="w-full rounded-lg border border-white/[0.06] bg-charcoal-lighter px-3 py-2 text-xs text-cream placeholder:text-muted/40 focus:border-amber/40 focus:outline-none" />
+                  {importError && <p className="text-xs text-red-400">{importError}</p>}
+                  <button onClick={handleImport} disabled={!importText.trim()} className="rounded-lg bg-amber px-4 py-1.5 text-xs font-medium text-charcoal transition hover:bg-amber/90 disabled:opacity-40">Import & Populate</button>
+                </div>
+              )}
+            </div>
+
+            <SelectField
             label="Industry / Vertical"
             value={formData.industry || ""}
             onChange={(v) => setField("industry", v)}
@@ -161,7 +280,8 @@ export default function MarketSizingPage() {
             <FormField label="SOM % of SAM" value={formData.som_percent || ""} onChange={(v) => setField("som_percent", v)} type="number" suffix="%" placeholder="10" hint="% of SAM you can realistically capture in 1–3 years" />
           </div>
         </div>
-      )}
+        );
+      }}
     </ToolLayout>
   );
 }
