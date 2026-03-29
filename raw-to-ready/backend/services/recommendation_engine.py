@@ -94,10 +94,12 @@ def build_recommendations(breadcrumbs: List[dict]) -> List[RecommendedTool]:
                     tool_reasons.setdefault(tool_key, []).append(reason)
                     tool_categories[tool_key] = mapping["category"]
 
-    # Build final list
+    # Build final list — only include tools that have an affiliate link
     recommendations: List[RecommendedTool] = []
     for tool_key, reasons in tool_reasons.items():
         link = AFFILIATE_LINKS.get(tool_key, "")
+        if not link:
+            continue
         recommendations.append(RecommendedTool(
             tool_key=tool_key,
             tool_name=TOOL_DISPLAY_NAMES.get(tool_key, tool_key.title()),
