@@ -12,6 +12,7 @@ TOOL_DESCRIPTIONS: Dict[str, str] = {
     "shopify":      "Start your online store free, then just $1/month to keep building. Shopify powers over 1M businesses with everything from storefronts to payments to shipping — all in one place. Plus, earn up to $13,000 in credits as you grow.",
     "smartli":      "AI-powered copywriting built for ecommerce. Smartli writes high-converting product descriptions, SEO blogs, and ads in seconds — so you can launch faster and rank higher without hiring a copywriter.",
     "railway":      "Deploy your backend, frontend, or database in minutes — no DevOps required. Railway auto-scales with your business, so you only pay for what you use. The fastest way to go from code to production.",
+    "easyship":     "Simplify shipping and fulfillment for ecommerce. Easyship integrates with 300+ courier services worldwide, manages returns, and offers discounted rates — so you can scale shipping without the headaches.",
     "stripe":       "Accept payments online or in person. Stripe handles billing, subscriptions, invoicing, and fraud detection so you can focus on building.",
     "notion":       "One workspace for docs, databases, wikis, and project management. Replace five tools with one and keep your whole team aligned.",
     "hubspot":      "Free CRM to manage your leads, deals, and customer emails in one place. Scales from solo founder to full sales team without switching tools.",
@@ -54,6 +55,7 @@ TOOL_DISPLAY_NAMES: Dict[str, str] = {
     "faire": "Faire",
     "tradegecko": "TradeGecko",
     "shipstation": "ShipStation",
+    "easyship": "Easyship",
     "semrush": "Semrush",
     "ahrefs": "Ahrefs",
 }

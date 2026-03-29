@@ -51,6 +51,7 @@ AFFILIATE_LINKS = {
     "faire":            "",
     "tradegecko":       "",
     "shipstation":      "",
+    "easyship":         "https://easyship.ilbqy6.net/0GGO1J",
 
     # ANALYTICS & SEO
     "semrush":          "",

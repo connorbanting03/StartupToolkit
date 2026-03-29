@@ -15,13 +15,13 @@
     {
       "id": "inventory-management",
       "keywords": ["inventory", "stock", "SKU", "warehouse", "bulk order", "reorder", "units", "storage", "fulfillment"],
-      "tools": ["tradegecko", "shipstation", "shopify"],
+      "tools": ["tradegecko", "shipstation", "easyship", "shopify"],
       "category": "Inventory"
     },
     {
       "id": "supplier-sourcing",
       "keywords": ["supplier", "wholesale", "manufacturer", "lumber", "fabric", "raw material", "sourcing", "vendor", "B2B", "bulk", "MOQ", "minimum order", "factory"],
-      "tools": ["faire", "shipstation"],
+      "tools": ["faire", "shipstation", "easyship"],
       "category": "Supply Chain"
     },
     {
