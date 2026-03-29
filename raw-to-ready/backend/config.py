@@ -41,6 +41,7 @@ AFFILIATE_LINKS = {
     "salesforce":       "",
 
     # HOSTING & WEB
+    "railway":          "https://railway.com?referralCode=3YaO6j",
     "bluehost":         "",
     "ghost":            "",
     "framer":           "",

@@ -35,6 +35,7 @@ TOOL_DISPLAY_NAMES: Dict[str, str] = {
     "bluehost": "Bluehost",
     "ghost": "Ghost",
     "framer": "Framer",
+    "railway": "Railway",
     "faire": "Faire",
     "tradegecko": "TradeGecko",
     "shipstation": "ShipStation",
