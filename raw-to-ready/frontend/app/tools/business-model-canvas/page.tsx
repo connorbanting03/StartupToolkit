@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ToolLayout } from "@/components/tools/tool-layout";
 import { TextAreaField } from "@/components/tools/form-fields";
 import { ExternalLink, Copy, Check, Sparkles, Upload } from "lucide-react";
+import { AiAutofillButton } from "@/components/tools/ai-autofill-button";
 
 const CLAUDE_URL = "https://claude.ai/new";
 
@@ -266,8 +267,9 @@ export default function BusinessModelCanvasPage() {
           setTimeout(() => setCopied(false), 2000);
         };
 
-        const handleImport = () => {
-          const parsed = parseClaudeOutput(importText);
+        const handleImport = (override?: string) => {
+          const text = typeof override === "string" ? override : importText;
+          const parsed = parseClaudeOutput(text);
           const keys = Object.keys(parsed);
           if (keys.length === 0) {
             setImportError(
@@ -334,6 +336,7 @@ export default function BusinessModelCanvasPage() {
               </div>
 
               <div className="flex flex-wrap gap-2">
+                <AiAutofillButton prompt={prompt} onResult={(t) => { setShowImport(true); setImportText(t); handleImport(t); }} />
                 <button
                   onClick={handleCopyPrompt}
                   className="flex items-center gap-1.5 rounded-lg border border-white/[0.06] bg-charcoal px-3 py-1.5 text-xs font-medium text-cream transition hover:border-amber/30"
@@ -383,7 +386,7 @@ export default function BusinessModelCanvasPage() {
                     <p className="text-xs text-red-400">{importError}</p>
                   )}
                   <button
-                    onClick={handleImport}
+                    onClick={() => handleImport()}
                     disabled={!importText.trim()}
                     className="rounded-lg bg-amber px-4 py-1.5 text-xs font-medium text-charcoal transition hover:bg-amber/90 disabled:opacity-40"
                   >

@@ -50,6 +50,15 @@ export const api = {
       method: "DELETE",
     }),
 
+  // AI auto-fill (optional; enabled when the backend has ANTHROPIC_API_KEY set)
+  aiStatus: () => apiFetch<{ enabled: boolean; daily_limit: number }>("/api/ai/status"),
+
+  aiAutofill: (prompt: string) =>
+    apiFetch<{ text: string; remaining_today: number }>("/api/ai/autofill", {
+      method: "POST",
+      body: JSON.stringify({ prompt }),
+    }),
+
   // Recommendations
   getRecommendations: (projectId: string) =>
     apiFetch<any>(`/api/recommendations/${encodeURIComponent(projectId)}`),
