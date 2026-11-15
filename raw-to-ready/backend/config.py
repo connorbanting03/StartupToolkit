@@ -1,9 +1,16 @@
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
 # ============================================================
-# RAW TO READY — AFFILIATE LINKS CONFIGURATION
-# Paste your affiliate links below. Leave empty if not yet set.
+# STARTUPTOOLKIT — AFFILIATE LINKS CONFIGURATION
+# Defaults live here. Any link can be overridden per-deployment with an
+# environment variable named AFFILIATE_<KEY>, e.g. AFFILIATE_SHOPIFY=https://...
+# Leave a link empty to hide that tool from recommendations.
 # ============================================================
 
-AFFILIATE_LINKS = {
+_DEFAULT_AFFILIATE_LINKS = {
 
     # E-COMMERCE & SALES
     "shopify":          "https://shopify.pxf.io/m4OXk1",
@@ -71,14 +78,15 @@ AFFILIATE_LINKS = {
 
 }
 
-import os
-from dotenv import load_dotenv
 
-load_dotenv()
+AFFILIATE_LINKS = {
+    key: os.environ.get(f"AFFILIATE_{key.upper()}", default).strip()
+    for key, default in _DEFAULT_AFFILIATE_LINKS.items()
+}
 
 # ============================================================
 # SUPABASE CONFIG
-# Set SUPABASE_URL and SUPABASE_KEY as Railway environment variables
+# Set SUPABASE_URL and SUPABASE_KEY as environment variables (Railway, .env, ...)
 # ============================================================
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "")
@@ -86,5 +94,14 @@ SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "")
 # ============================================================
 # APP CONFIG
 # ============================================================
-APP_NAME = os.environ.get("APP_NAME", "Startup Blueprint Kit")
+APP_NAME = os.environ.get("APP_NAME", "StartupToolkit")
 APP_ENV = os.environ.get("APP_ENV", "production")  # "development" | "production"
+
+# ============================================================
+# AI AUTO-FILL (optional)
+# With ANTHROPIC_API_KEY set, tool pages get a one-click "Auto-fill" button that
+# runs the same prompt server-side. Without it, the copy / paste flow still works.
+# ============================================================
+ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "").strip()
+ANTHROPIC_MODEL = os.environ.get("ANTHROPIC_MODEL", "claude-haiku-5-5")
+AI_DAILY_LIMIT = int(os.environ.get("AI_DAILY_LIMIT", "20"))  # requests per user per UTC day

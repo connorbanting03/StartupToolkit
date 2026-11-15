@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import os
 
 from backend.config import APP_NAME, APP_ENV
-from backend.routers import projects, tools, recommendations, auth
+from backend.routers import projects, tools, recommendations, auth, ai
 
 app = FastAPI(
     title=APP_NAME,
@@ -13,7 +13,7 @@ app = FastAPI(
 )
 
 # ALLOWED_ORIGINS env var: comma-separated list of allowed origins
-# e.g. "https://my-frontend.railway.app,https://startupblueprintkit.com"
+# e.g. "https://my-frontend.railway.app,https://your-domain.com"
 _origins_env = os.environ.get("ALLOWED_ORIGINS", "")
 allowed_origins = [
     "http://localhost:3000",
@@ -32,6 +32,7 @@ app.include_router(auth.router)
 app.include_router(projects.router)
 app.include_router(tools.router)
 app.include_router(recommendations.router)
+app.include_router(ai.router)
 
 
 @app.get("/api/health")
