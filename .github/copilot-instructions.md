@@ -1,6 +1,6 @@
-# Raw to Ready — Workspace Instructions
+# StartupToolkit — Workspace Instructions
 
-You are developing **Raw to Ready**, a business planning platform with affiliate-driven recommendations. Read `PROJECT-CONTEXT.md` at the repo root for full technical context before making changes.
+You are developing **StartupToolkit**, a business planning platform with affiliate-driven recommendations. Read `PROJECT-CONTEXT.md` at the repo root for full technical context before making changes.
 
 ## Stack
 
@@ -13,7 +13,7 @@ You are developing **Raw to Ready**, a business planning platform with affiliate
 
 | Task | Command |
 |------|---------|
-| Start backend | `cd raw-to-ready && /Users/connorbanting/Documents/RawToReady/.venv/bin/python -m uvicorn backend.main:app --reload --port 8000` |
+| Start backend | `cd raw-to-ready && python -m uvicorn backend.main:app --reload --port 8000` |
 | Start frontend | `cd raw-to-ready/frontend && npm run dev` |
 | Run migration | `cd raw-to-ready && npx supabase db push --linked` |
 | Check types | `cd raw-to-ready/frontend && npx tsc --noEmit` |

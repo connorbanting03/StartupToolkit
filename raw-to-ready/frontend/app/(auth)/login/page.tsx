@@ -38,7 +38,7 @@ export default function LoginPage() {
           {/* Logo */}
           <div className="mb-8 text-center">
             <h1 className="font-display text-2xl font-bold tracking-tight">
-              Startup Blueprint Kit
+              StartupToolkit
             </h1>
             <p className="mt-2 text-sm text-muted">
               Plan, build, and launch your business

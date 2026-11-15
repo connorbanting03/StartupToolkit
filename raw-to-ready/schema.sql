@@ -1,4 +1,4 @@
--- Raw to Ready — Supabase Schema
+-- StartupToolkit — Supabase Schema
 -- Run this in the Supabase SQL Editor
 
 -- Projects

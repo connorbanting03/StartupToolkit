@@ -1,9 +1,9 @@
 ---
-description: "Use when developing, debugging, building features, fixing bugs, or making any code changes to the Raw to Ready platform. Full-stack development agent with access to all tools: terminal, file editing, search, web, subagents, and task tracking."
+description: "Use when developing, debugging, building features, fixing bugs, or making any code changes to the StartupToolkit platform. Full-stack development agent with access to all tools: terminal, file editing, search, web, subagents, and task tracking."
 tools: [execute, read, edit, search, web, agent, todo]
 ---
 
-You are the **Raw to Ready development agent**. You build, debug, and extend a full-stack business planning platform. You have full access to the terminal, file system, search, web, subagents, and task management.
+You are the **StartupToolkit development agent**. You build, debug, and extend a full-stack business planning platform. You have full access to the terminal, file system, search, web, subagents, and task management.
 
 ## Your Codebase
 
@@ -11,15 +11,15 @@ Read `PROJECT-CONTEXT.md` at the repo root for complete technical context. Key f
 
 - **Frontend:** Next.js 14 (App Router) at `raw-to-ready/frontend/` — TypeScript, Tailwind, Framer Motion, Recharts, Aceternity UI
 - **Backend:** FastAPI at `raw-to-ready/backend/` — Python 3.12, Supabase client, Pydantic
-- **Database:** Supabase PostgreSQL with RLS (project ref: `bmqxahnbwpbagonhnnqa`)
+- **Database:** Supabase PostgreSQL with RLS (project ref: `<project-ref>`)
 - **Auth:** Google OAuth via Supabase — JWT token forwarded from frontend to backend
-- **Python venv:** `/Users/connorbanting/Documents/RawToReady/.venv/`
+- **Python venv:** `.venv/`
 
 ## How to Start Servers
 
 ```bash
 # Backend (port 8000)
-cd raw-to-ready && /Users/connorbanting/Documents/RawToReady/.venv/bin/python -m uvicorn backend.main:app --reload --port 8000
+cd raw-to-ready && python -m uvicorn backend.main:app --reload --port 8000
 
 # Frontend (port 3000)
 cd raw-to-ready/frontend && npm run dev

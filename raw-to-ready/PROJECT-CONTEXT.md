@@ -1,4 +1,4 @@
-# Raw to Ready — Technical Context
+# StartupToolkit — Technical Context
 
 > This document describes the current state of the codebase for any agent or developer picking up the project.
 
@@ -38,7 +38,8 @@ raw-to-ready/
 │   │   ├── auth.py                      # GET /api/auth/me
 │   │   ├── projects.py                  # CRUD /api/projects, enriched responses
 │   │   ├── tools.py                     # Submit/get/delete tool instances
-│   │   └── recommendations.py           # GET /api/recommendations/{project_id}
+│   │   ├── recommendations.py           # GET /api/recommendations/{project_id}
+│   │   └── ai.py                        # GET /api/ai/status, POST /api/ai/autofill (optional, needs ANTHROPIC_API_KEY)
 │   ├── services/
 │   │   ├── keyword_extractor.py         # extract_keywords(input_data) → keywords, tools
 │   │   └── recommendation_engine.py     # build_recommendations(breadcrumbs) → cards
@@ -131,10 +132,10 @@ auth.users (Supabase managed)
 
 ## Supabase Configuration
 
-- **Project ref:** `bmqxahnbwpbagonhnnqa`
-- **URL:** `https://bmqxahnbwpbagonhnnqa.supabase.co`
+- **Project ref:** `<project-ref>`
+- **URL:** `https://<project-ref>.supabase.co`
 - **Auth:** Google OAuth enabled (client ID: `196931321915-dupl64ipq349t9cmk4t91qja84mhl1h6`)
-- **Redirect URIs:** `http://localhost:3000`, `https://rawtoready.co`
+- **Redirect URIs:** `http://localhost:3000`, `https://your-domain.com`
 
 ---
 
@@ -143,7 +144,7 @@ auth.users (Supabase managed)
 ### Backend
 ```bash
 cd raw-to-ready
-source /Users/connorbanting/Documents/RawToReady/.venv/bin/activate
+source .venv/bin/activate
 python -m uvicorn backend.main:app --reload --port 8000
 ```
 
@@ -154,7 +155,7 @@ npm run dev
 ```
 
 ### Python venv
-The virtualenv lives at `/Users/connorbanting/Documents/RawToReady/.venv/` (Python 3.12.9). Always use this when running backend commands.
+The virtualenv lives at `.venv/` (Python 3.12.9). Always use this when running backend commands.
 
 ---
 

@@ -1,16 +1,16 @@
-# Raw to Ready — Product Vision
+# StartupToolkit — Product Vision
 
 > *"From raw idea to ready to launch."*
 
-**Domain:** rawtoready.co
+**Domain:** configured per deployment
 
 ---
 
 ## What It Is
 
-Raw to Ready is a platform for founders, solopreneurs, and small business owners to plan their businesses using real, functional tools — not templates, not AI-generated advice. Users fill out financial calculators, supplier matrices, pricing tools, and cash flow forecasts with their own numbers. As they work, the platform silently extracts keywords from their inputs and surfaces relevant third-party tool recommendations via affiliate links.
+StartupToolkit is a platform for founders, solopreneurs, and small business owners to plan their businesses using real, functional tools — not templates, not AI-generated advice. Users fill out financial calculators, supplier matrices, pricing tools, and cash flow forecasts with their own numbers. As they work, the platform silently extracts keywords from their inputs and surfaces relevant third-party tool recommendations via affiliate links.
 
-The core insight: people reveal what they need by describing what they're building. Raw to Ready captures those signals and turns them into monetizable recommendations — no AI, just pattern matching against a keyword-to-tool mapping database.
+The core insight: people reveal what they need by describing what they're building. StartupToolkit captures those signals and turns them into monetizable recommendations — no AI, just pattern matching against a keyword-to-tool mapping database.
 
 ---
 
